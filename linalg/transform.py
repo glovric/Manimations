@@ -9,6 +9,7 @@ class MatrixTransformation(LinearTransformationScene):
             self,
             show_coordinates=True,
             show_basis_vectors=False,
+            leave_ghost_vectors=True
         )
 
     def construct(self):
