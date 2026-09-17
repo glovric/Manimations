@@ -31,13 +31,16 @@ class MatrixTransformation(LinearTransformationScene):
 
         vectors = [Vector(vec, color=color) for vec, color in unit_vectors]
 
-        i_label = MathTex(
-            r"\hat{i}",
-            color=WHITE
-        ).next_to(
-            vectors[0].get_end(),
-            DOWN,
-            buff=0.15
+        i_label = (
+            MathTex(r"\vec{i}", color=WHITE)
+            .scale(0.7)
+            .next_to(vectors[0].get_end(), DOWN, buff=0.15)
+        )
+
+        j_label = (
+            MathTex(r"\vec{j}", color=WHITE)
+            .scale(0.7)
+            .next_to(vectors[2].get_end(), RIGHT*1.8 ,buff=0.15)
         )
 
         matrix_tex = (
@@ -63,7 +66,7 @@ class MatrixTransformation(LinearTransformationScene):
             run_time=2,
         )
 
-        self.play(Write(i_label))
+        self.play(Write(i_label), Write(j_label))
 
         for v in vectors:
             self.add_vector(v)
@@ -71,7 +74,13 @@ class MatrixTransformation(LinearTransformationScene):
         self.play(Write(matrix_tex))
         self.wait(1)
 
-        self.apply_matrix(matrix)
+        self.apply_matrix(
+            matrix,
+            added_anims=[
+                MaintainPositionRelativeTo(i_label, vectors[0]),
+                MaintainPositionRelativeTo(j_label, vectors[2]),
+            ],
+        )
         self.wait(1)
         # ---------------------------------------------------------
         # Add explanation
