@@ -12,10 +12,11 @@ class Secant(Scene):
         x_current = tracker.get_value()
         dx = x_current - x0
         dy = f(x_current) - y0
+        constant = 0.75 / dx
 
         secant = Line(
-            axes.c2p(x0 - 100 * dx, y0 - 100 * dy),
-            axes.c2p(x_current + 100 * dx, f(x_current) + 100 * dy),
+            axes.c2p(x0 - constant * dx, y0 - constant * dy),
+            axes.c2p(x_current + constant * dx, f(x_current) + constant * dy),
             color=BLUE,
             stroke_width=2
         )
@@ -60,8 +61,8 @@ class Secant(Scene):
         # -------------------------
         # Axes
         # -------------------------
-        x_range = [-1, 4, 1]
-        y_range = [-1, 16, 1]
+        x_range = [-1, 4]
+        y_range = [0, f(4)]
         axes = Axes(
             x_range=x_range,
             y_range=y_range,
@@ -134,7 +135,7 @@ class Secant(Scene):
                     f(tracker.get_value())
                 ),
                 color=RED,
-                radius=0.1
+                radius=0.08
             )
         )
 
@@ -196,15 +197,7 @@ class Secant(Scene):
         # Final summary
         # -------------------------
         self.play(
-            FadeOut(
-                VGroup(
-                    axes,
-                    axes_labels,
-                    graph,
-                    graph_label,
-                    definition,
-                )
-            )
+            *[FadeOut(mobj) for mobj in self.mobjects]
         )
 
         summary = Text(
