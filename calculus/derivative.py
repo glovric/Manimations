@@ -24,11 +24,11 @@ class DerivativeLeftRight(Scene):
         ).shift(RIGHT*3).scale(0.5)
         
         ax2.next_to(ax1, RIGHT, buff=1)
-        ax1.align_to(ax2, DOWN)  # Align bottom edges
+        ax1.align_to(ax2, DOWN)
         
         graph1 = ax1.plot(f, x_range=[-2.3, 2.3], color=YELLOW)
         
-        tracker = ValueTracker(-2)  # Start from leftmost point
+        tracker = ValueTracker(-2)
         
         point1 = Dot().add_updater(
             lambda m: m.move_to(ax1.c2p(tracker.get_value(), f(tracker.get_value())))
@@ -148,7 +148,7 @@ class DerivativeTopBottom(Scene):
 
         # Vertical connecting line between the two points
         connecting_line = always_redraw(lambda:
-            Line(
+            DashedLine(
                 ax1.c2p(tracker.get_value(), f(tracker.get_value())),
                 ax2.c2p(tracker.get_value(), f_prime(tracker.get_value())),
                 color=WHITE,
