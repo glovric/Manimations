@@ -164,3 +164,163 @@ class IntegralConstant(IntegralTopBottom):
             "graph1_x_range": [0, 5]
         }
         super().__init__(f, F, axes_params, **kwargs)
+
+class RiemannSums(Scene):
+
+    def construct(self):
+
+        def f(x):
+            return x**2
+
+        def make_rects(n):
+            dx = (b - a) / n
+            rects = VGroup()
+            approx = 0.0
+            for i in range(n):
+                xi = a + (i + 1) * dx  # right endpoint
+                h = f(xi)
+                approx += h * dx
+                rect = Rectangle(
+                    width=axes.x_length / (3.8) * dx,
+                    height=axes.c2p(0, h)[1] - axes.c2p(0, 0)[1],
+                    fill_color=TEAL,
+                    fill_opacity=0.45,
+                    stroke_color=BLUE,
+                    stroke_width=1.2,
+                )
+                # position: bottom-left corner of rect
+                bl = axes.c2p(a + i * dx, 0)
+                rect.move_to(
+                    [bl[0] + rect.width / 2,
+                     bl[1] + rect.height / 2,
+                     0]
+                )
+                rects.add(rect)
+            return rects, approx
+
+        self.camera.background_color = "#1a1a2e"
+
+        a, b = 0.0, 3.0
+
+        title = (
+            Text("Riemann Sums → Definite Integral", font_size=36, color=WHITE)
+            .to_edge(UP, buff=0.25)
+        )
+
+        axes = (
+            Axes(
+                x_range=[-0.2, 3.6, 1],
+                y_range=[-0.2, 9.5, 2],
+                x_length=6.5,
+                y_length=5.0,
+                axis_config={"color": GREY_B, "stroke_width": 1},
+                tips=True,
+            )
+            .shift(LEFT * 1.8 + DOWN * 0.45)
+        )
+
+        ax_labels = axes.get_axis_labels(
+            x_label=MathTex("x", font_size=26),
+            y_label=MathTex("y", font_size=26),
+        )
+
+        curve = axes.plot(f, x_range=[0, 3.05], color=BLUE_B, stroke_width=3)
+        f_label = (
+            MathTex("f(x)=x^2", font_size=26, color=BLUE_B)
+            .move_to(axes.c2p(2.5, 10))
+        )
+
+        riemann_formula = (
+            MathTex(
+                r"\sum_{i=1}^{n} f(x_i)\,\Delta x \approx",
+                font_size=40, 
+                color=WHITE,
+            )
+            .to_edge(RIGHT)
+            .shift(2 * LEFT)
+        )
+
+        rects, val = make_rects(4)
+        n_label = (
+            MathTex("n = 4", font_size=40, color=TEAL_B)
+            .next_to(riemann_formula, UP)
+        )
+
+        value = (
+            DecimalNumber(
+                val,
+                num_decimal_places=3,
+                font_size=40,
+                color=TEAL_B,
+            )
+            .next_to(riemann_formula, RIGHT, buff=0.1)
+            .shift(0.04*UP)
+        )
+
+        formula_group = VGroup(
+            riemann_formula,
+            value
+        )
+
+        shaded = axes.get_area(curve, x_range=[0, 3], color=[TEAL, BLUE], opacity=0.35)
+
+        int_formula = MathTex(
+            r"\int_0^3 f(x)\,dx = {{9}}",
+            font_size=40,
+            color=WHITE,
+        ).move_to(formula_group)
+        int_formula.get_part_by_tex("9").set_color(TEAL_B)
+
+        highlight = SurroundingRectangle(
+            int_formula,
+            color=YELLOW,
+            buff=0.1,
+        )
+
+        # ------ Animation start ----- #
+
+        self.play(Write(title))
+
+        self.play(Create(axes), Write(ax_labels))
+
+        self.play(Create(curve), Write(f_label))
+        self.wait(0.4)
+
+        self.play(
+            Create(rects), 
+            Write(n_label), 
+            Write(formula_group)
+        )
+        self.wait(1.5)
+
+        for n in [8, 16, 32, 64, 128, 256, 512]:
+            rects_new, val_new = make_rects(n)
+            new_n_lbl = MathTex(f"n = {n}", font_size=40, color=TEAL_B).next_to(riemann_formula, UP)
+
+            self.play(
+                Transform(rects, rects_new),
+                Transform(n_label, new_n_lbl),
+                value.animate.set_value(val_new),
+                run_time=2,
+            )
+            self.wait(1.5)
+
+        new_n_lbl = MathTex(r"n \rightarrow \infty", font_size=40, color=TEAL_B).next_to(riemann_formula, UP)
+
+        self.play(FadeIn(shaded), FadeOut(rects), Transform(n_label, new_n_lbl))
+
+        self.play(
+            ReplacementTransform(formula_group, int_formula),
+            run_time=1.2,
+            rate_func=smooth,
+        )
+
+        self.play(
+            ShowPassingFlash(
+                highlight,
+                time_width=1,
+            ),
+            run_time=1,
+        )
+
+        self.wait(3)
