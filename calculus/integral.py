@@ -31,7 +31,7 @@ class IntegralTopBottom(Scene):
             y_range=ax2_y_range,
             #x_length=6,
             #y_length=2.5,
-            axis_config={"color": GREEN}
+            axis_config={"color": GRAY_C}
         ).shift(DOWN * 2.2).scale(0.5)
 
         # Align both axes horizontally (same x-position)
@@ -57,7 +57,7 @@ class IntegralTopBottom(Scene):
             lambda: ax1.get_area(
                 graph1,
                 x_range=[0, tracker.get_value()],
-                color=TEAL,
+                color=TEAL_B,
                 stroke_color=BLUE,
                 opacity=0.4,
             )
@@ -66,7 +66,7 @@ class IntegralTopBottom(Scene):
         # Traced path for derivative - this will be drawn progressively
         trace = TracedPath(
             lambda: ax2.c2p(tracker.get_value(), self.F(tracker.get_value())),
-            stroke_color=ORANGE,
+            stroke_color=TEAL_B,
             stroke_width=3
         )
 
@@ -133,7 +133,7 @@ class IntegralTopBottom(Scene):
         self.wait(0.5)
 
         # Animate - as tracker moves, the trace draws the derivative graph
-        self.play(tracker.animate.set_value(5), run_time=6)
+        self.play(tracker.animate.set_value(5), run_time=9)
 
         self.wait(3)
 
